@@ -4,13 +4,28 @@ import { invalidDataError, notFoundError } from '@/errors';
 import addressRepository, { CreateAddressParams } from '@/repositories/address-repository';
 import enrollmentRepository, { CreateEnrollmentParams } from '@/repositories/enrollment-repository';
 import { exclude } from '@/utils/prisma-utils';
+import { ViaCEPAddress } from '@/protocols';
 
-async function getAddressFromCEP() {
-  const result = await request.get(`${process.env.VIA_CEP_API}/37440000/json/`);
+async function getAddressFromCEP(cep: number): Promise<ViaCEPAddress> {
+  const result = await request.get(`${process.env.VIA_CEP_API}/${cep}/json/`);
 
   if (!result.data) {
-    throw notFoundError();
+    throw invalidDataError(['Invalid CEP']);
   }
+
+  if (result.data?.erro) {
+    throw invalidDataError(['invalid CEP']);
+  }
+
+  const adress: ViaCEPAddress = {
+    logradouro: result.data.logradouro,
+    complemento: result.data.complemento,
+    bairro: result.data.bairro,
+    localidade: result.data.localidade,
+    uf: result.data.uf,
+  };
+
+  return adress;
 }
 
 async function getOneWithAddressByUserId(userId: number): Promise<GetOneWithAddressByUserIdResult> {
@@ -40,9 +55,10 @@ type GetAddressResult = Omit<Address, 'createdAt' | 'updatedAt' | 'enrollmentId'
 async function createOrUpdateEnrollmentWithAddress(params: CreateOrUpdateEnrollmentWithAddress) {
   const enrollment = exclude(params, 'address');
   const address = getAddressForUpsert(params.address);
+  const cep = address.cep.replace('-', '');
 
   try {
-    await getAddressFromCEP();
+    await getAddressFromCEP(Number(cep));
   } catch {
     throw invalidDataError(['invalid CEP']);
   }
