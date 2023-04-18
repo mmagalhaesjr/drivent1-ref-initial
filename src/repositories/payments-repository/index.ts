@@ -1,3 +1,4 @@
+import { Payment } from '@prisma/client';
 import { prisma } from '@/config';
 
 async function getPaymentInfo(ticketId: number) {
@@ -7,9 +8,22 @@ async function getPaymentInfo(ticketId: number) {
     },
   });
 }
+type insertPaymentParams = {
+  ticketId: number;
+  value: number;
+  cardIssuer: string;
+  cardLastDigits: string;
+};
 
-async function makePayment() {
-  return;
+async function makePayment({ ticketId, value, cardIssuer, cardLastDigits }: insertPaymentParams): Promise<Payment> {
+  return await prisma.payment.create({
+    data: {
+      ticketId,
+      value,
+      cardIssuer,
+      cardLastDigits,
+    },
+  });
 }
 
 const paymentsRepository = {

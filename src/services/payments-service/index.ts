@@ -19,9 +19,34 @@ async function getPaymentInfo({ ticketId, userId }: GetPaymentByTicketIdParams) 
 
   return payment;
 }
+type makePaymentParams = {
+  ticketId: number;
+  userId: number;
+  cardData: {
+    issuer: string;
+    number: number;
+    name: string;
+    expirationDate: Date;
+    cvv: number;
+  };
+};
+async function makePayment({ ticketId, userId, cardData }: makePaymentParams) {
+  const ticket = await ticktesRepository.getTicketById(ticketId);
+  if (!ticket) throw notFoundError();
+  if (ticket.Enrollment.userId !== userId) throw unauthorizedError();
 
-async function makePayment() {
-  return;
+  const cardLastDigits = cardData.number.toString().slice(-4);
+
+  const pay = await paymentsRepository.makePayment({
+    ticketId: ticketId,
+    value: ticket.TicketType.price,
+    cardIssuer: cardData.issuer,
+    cardLastDigits,
+  });
+
+  await ticktesRepository.updateTicketPayment(ticketId);
+
+  return pay;
 }
 
 const paymentsService = {

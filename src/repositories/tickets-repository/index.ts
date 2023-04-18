@@ -30,7 +30,18 @@ async function postNewTicket({ status, enrollmentId, ticketTypeId }: CreateTicke
 async function getTicketById(id: number) {
   return prisma.ticket.findFirst({
     where: { id },
-    include: { Enrollment: true },
+    include: { Enrollment: true, TicketType: true },
+  });
+}
+
+async function updateTicketPayment(ticketId: number) {
+  return prisma.ticket.update({
+    where: {
+      id: ticketId,
+    },
+    data: {
+      status: 'PAID',
+    },
   });
 }
 
@@ -39,6 +50,7 @@ const ticktesRepository = {
   getTickets,
   postNewTicket,
   getTicketById,
+  updateTicketPayment,
 };
 
 export default ticktesRepository;
