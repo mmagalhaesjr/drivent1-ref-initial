@@ -22,8 +22,19 @@ async function listAllHotels(userId: number) {
   return hotels;
 }
 
-async function listAllHotelsRooms() {
-  return;
+async function listAllHotelsRooms(userId: number, hotelId: number) {
+  const enrollment = await enrollmentRepository.findEnrollmentByUserId(userId);
+  if (!enrollment) throw notFoundError();
+
+  const ticketId = await ticketsRepository.getTickets(enrollment.id);
+
+  if (!ticketId) throw notFoundError();
+
+  if (ticketId.status === 'RESERVED' || ticketId.TicketType.isRemote || !ticketId.TicketType.includesHotel)
+    throw paymentRequiredError();
+
+  const rooms = await hotelsRepository.listAllHotelsRooms(hotelId);
+  return rooms;
 }
 
 const hotelsService = {
@@ -32,7 +43,3 @@ const hotelsService = {
 };
 
 export default hotelsService;
-
-function cannotListHotelsError() {
-  throw new Error('Function not implemented.');
-}
