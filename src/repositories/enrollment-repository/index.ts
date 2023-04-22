@@ -1,7 +1,7 @@
 import { Enrollment } from '@prisma/client';
 import { prisma } from '@/config';
 
-async function findEnrollmentByUserId(userId: number) {
+async function findEnrollmentByUserId(userId: number): Promise<Enrollment> {
   return prisma.enrollment.findFirst({
     where: { userId },
   });

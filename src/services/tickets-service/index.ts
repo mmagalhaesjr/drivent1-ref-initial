@@ -12,15 +12,11 @@ async function getTicketsTypes() {
 async function getTickets(userId: number) {
   const enrollments = await enrollmentRepository.findEnrollmentByUserId(userId);
 
-  if (!enrollments) {
-    throw requestError(404, 'Not found');
-  }
+  if (!enrollments) throw requestError(404, 'Not found');
 
   const ticket = await ticktesRepository.getTickets(enrollments.id);
 
-  if (!ticket) {
-    throw requestError(404, 'Not found');
-  }
+  if (!ticket) throw requestError(404, 'Not found');
 
   return ticket;
 }
