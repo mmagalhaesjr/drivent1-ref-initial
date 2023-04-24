@@ -12,8 +12,9 @@ async function listAllHotels(userId: number) {
 
   if (!ticketId) throw notFoundError();
 
-  if (ticketId.status === 'RESERVED' || ticketId.TicketType.isRemote || !ticketId.TicketType.includesHotel)
+  if (ticketId.status === 'RESERVED' || ticketId.TicketType.isRemote || !ticketId.TicketType.includesHotel) {
     throw paymentRequiredError();
+  }
 
   const hotels = await hotelsRepository.listAllHotels();
 
@@ -30,8 +31,9 @@ async function listAllHotelsRooms(userId: number, hotelId: number) {
 
   if (!ticketId) throw notFoundError();
 
-  if (ticketId.status === 'RESERVED' || ticketId.TicketType.isRemote || !ticketId.TicketType.includesHotel)
+  if (ticketId.status === 'RESERVED' || ticketId.TicketType.isRemote || !ticketId.TicketType.includesHotel) {
     throw paymentRequiredError();
+  }
 
   const rooms = await hotelsRepository.listAllHotelsRooms(hotelId);
   return rooms;
