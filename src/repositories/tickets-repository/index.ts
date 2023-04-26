@@ -7,7 +7,11 @@ async function getTicketsTypes() {
   return prisma.ticketType.findMany();
 }
 
-async function getTickets(enrollmentId: number) {
+async function findTicketByEnrollmentId(enrollmentId: number): Promise<
+  Ticket & {
+    TicketType: TicketType;
+  }
+> {
   return prisma.ticket.findFirst({
     where: { enrollmentId },
     include: { TicketType: true },
