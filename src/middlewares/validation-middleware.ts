@@ -11,11 +11,7 @@ export function validateParams<T>(schema: ObjectSchema<T>): ValidationMiddleware
   return validate(schema, 'params');
 }
 
-export function validateQueryParams<T>(schema: ObjectSchema<T>): ValidationMiddleware {
-  return validate(schema, 'query');
-}
-
-function validate(schema: ObjectSchema, type: 'body' | 'params' | 'query') {
+function validate(schema: ObjectSchema, type: 'body' | 'params') {
   return (req: Request, res: Response, next: NextFunction) => {
     const { error } = schema.validate(req[type], {
       abortEarly: false,
@@ -23,8 +19,6 @@ function validate(schema: ObjectSchema, type: 'body' | 'params' | 'query') {
 
     if (!error) {
       next();
-    } else if (type === 'query') {
-      res.sendStatus(httpStatus.NO_CONTENT);
     } else {
       res.status(httpStatus.BAD_REQUEST).send(invalidDataError(error.details.map((d) => d.message)));
     }

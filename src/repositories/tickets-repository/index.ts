@@ -1,9 +1,8 @@
-import { Ticket, TicketType } from '@prisma/client';
+import { Ticket, TicketStatus, TicketType } from '@prisma/client';
 import { prisma } from '@/config';
+import { CreateTicketParams } from '@/protocols';
 
-type CreateTicketParams = Omit<Ticket, 'id' | 'createdAt' | 'updatedAt'>;
-
-async function getTicketsTypes() {
+async function findTicketTypes(): Promise<TicketType[]> {
   return prisma.ticketType.findMany();
 }
 
@@ -14,47 +13,56 @@ async function findTicketByEnrollmentId(enrollmentId: number): Promise<
 > {
   return prisma.ticket.findFirst({
     where: { enrollmentId },
-    include: { TicketType: true },
+    include: {
+      TicketType: true, //join
+    },
   });
 }
 
-async function postNewTicket({ status, enrollmentId, ticketTypeId }: CreateTicketParams) {
+async function createTicket(ticket: CreateTicketParams) {
   return prisma.ticket.create({
+    data: ticket,
+  });
+}
+
+async function findTickeyById(ticketId: number) {
+  return prisma.ticket.findFirst({
+    where: {
+      id: ticketId,
+    },
+    include: {
+      Enrollment: true,
+    },
+  });
+}
+
+async function findTickeWithTypeById(ticketId: number) {
+  return prisma.ticket.findFirst({
+    where: {
+      id: ticketId,
+    },
     include: {
       TicketType: true,
     },
-    data: {
-      status,
-      ticketTypeId,
-      enrollmentId,
-    },
   });
 }
 
-async function getTicketById(id: number) {
-  return prisma.ticket.findFirst({
-    where: { id },
-    include: { Enrollment: true, TicketType: true },
-  });
-}
-
-async function updateTicketPayment(ticketId: number) {
+async function ticketProcessPayment(ticketId: number) {
   return prisma.ticket.update({
     where: {
       id: ticketId,
     },
     data: {
-      status: 'PAID',
+      status: TicketStatus.PAID,
     },
   });
 }
 
-const ticktesRepository = {
-  getTicketsTypes,
-  getTickets,
-  postNewTicket,
-  getTicketById,
-  updateTicketPayment,
+export default {
+  findTicketTypes,
+  findTicketByEnrollmentId,
+  createTicket,
+  findTickeyById,
+  findTickeWithTypeById,
+  ticketProcessPayment,
 };
-
-export default ticktesRepository;

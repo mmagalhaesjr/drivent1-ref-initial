@@ -8,6 +8,7 @@ import { prisma } from '@/config';
 export async function authenticateToken(req: AuthenticatedRequest, res: Response, next: NextFunction) {
   const authHeader = req.header('Authorization');
   if (!authHeader) return generateUnauthorizedResponse(res);
+
   const token = authHeader.split(' ')[1];
   if (!token) return generateUnauthorizedResponse(res);
 
@@ -20,8 +21,6 @@ export async function authenticateToken(req: AuthenticatedRequest, res: Response
       },
     });
     if (!session) return generateUnauthorizedResponse(res);
-
-    res.locals.session = session;
 
     req.userId = userId;
 

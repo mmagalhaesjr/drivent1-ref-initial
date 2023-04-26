@@ -1,12 +1,6 @@
 import { Enrollment } from '@prisma/client';
 import { prisma } from '@/config';
 
-async function findEnrollmentByUserId(userId: number): Promise<Enrollment> {
-  return prisma.enrollment.findFirst({
-    where: { userId },
-  });
-}
-
 async function findWithAddressByUserId(userId: number) {
   return prisma.enrollment.findFirst({
     where: { userId },
@@ -30,13 +24,19 @@ async function upsert(
   });
 }
 
+async function findById(enrollmentId: number) {
+  return prisma.enrollment.findFirst({
+    where: { id: enrollmentId },
+  });
+}
+
 export type CreateEnrollmentParams = Omit<Enrollment, 'id' | 'createdAt' | 'updatedAt'>;
 export type UpdateEnrollmentParams = Omit<CreateEnrollmentParams, 'userId'>;
 
 const enrollmentRepository = {
   findWithAddressByUserId,
   upsert,
-  findEnrollmentByUserId,
+  findById,
 };
 
 export default enrollmentRepository;
