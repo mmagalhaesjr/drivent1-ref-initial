@@ -1,4 +1,5 @@
-import { Payment, Ticket } from '@prisma/client';
+import { create } from 'ts-node';
+import { Payment, Ticket, Booking } from '@prisma/client';
 
 export type ApplicationError = {
   name: string;
@@ -30,7 +31,7 @@ export type RequestError = {
   message: string;
 };
 
-export type CreateTicketParams = Omit<Ticket, 'id' | 'createdAt' | 'updatedAt'>;
+export type PaymentParams = Omit<Payment, 'id' | 'createdAt' | 'updatedAt'>;
 
 export type CardPaymentParams = {
   issuer: string;
@@ -40,8 +41,14 @@ export type CardPaymentParams = {
   cvv: number;
 };
 
-export type PaymentParams = Omit<Payment, 'id' | 'createdAt' | 'updatedAt'>;
+export type CreateTicketParams = Omit<Ticket, 'id' | 'createdAt' | 'updatedAt'>;
 
 export type InputTicketBody = {
   ticketTypeId: number;
+};
+
+export type CreateBooking = Omit<Booking, 'id' | 'createdAt' | 'updatedAt'>;
+
+export type InputBookingBody = {
+  bookingTypeId: number;
 };
