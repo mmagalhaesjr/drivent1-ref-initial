@@ -1,7 +1,5 @@
 import { Booking } from '@prisma/client';
-import { updateBooking } from '../../controllers/booking-controller';
-import { notFoundError } from '@/errors';
-import { cannotListHotelsError } from '@/errors/cannot-list-hotels-error';
+import { notFoundError, unauthorizedError } from '@/errors';
 import enrollmentRepository from '@/repositories/enrollment-repository';
 import ticketsRepository from '@/repositories/tickets-repository';
 import hotelRepository from '@/repositories/hotels-repository';
@@ -11,15 +9,19 @@ import { cannotBooking } from '@/errors/cannot-booking';
 async function createBooking(userId: number, roomId: number): Promise<Booking> {
   const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
 
+  if (!enrollment) throw notFoundError();
+
   const ticket = await ticketsRepository.findTicketByEnrollmentId(enrollment.id);
 
   if (!ticket) throw notFoundError();
 
   if (!ticket.TicketType.includesHotel || ticket.TicketType.isRemote || ticket.status !== 'PAID') {
-    throw cannotListHotelsError();
+    throw cannotBooking();
   }
 
   const room = await hotelRepository.findRoom(roomId);
+
+  if (!room) throw notFoundError();
 
   const bookings = await bookingRepository.findBookingsByRoomId(roomId);
 

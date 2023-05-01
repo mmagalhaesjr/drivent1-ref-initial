@@ -2,7 +2,7 @@ import { ApplicationError } from '@/protocols';
 
 export function cannotBooking(): ApplicationError {
   return {
-    name: 'cannotBooking',
+    name: 'CannotBooking',
     message: 'Cannot booking room!',
   };
 }

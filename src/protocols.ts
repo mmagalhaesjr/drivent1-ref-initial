@@ -50,5 +50,5 @@ export type InputTicketBody = {
 export type CreateBooking = Omit<Booking, 'id' | 'createdAt' | 'updatedAt'>;
 
 export type InputBookingBody = {
-  bookingTypeId: number;
+  roomId: number;
 };
