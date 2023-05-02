@@ -293,13 +293,10 @@ describe('PUT /booking', () => {
       const hotel = await createHotel();
       const room = await createRoomWithHotelId(hotel.id);
 
-      const otherUser = await createUser();
-      const otherUserBooking = await createBooking({ userId: otherUser.id, roomId: room.id });
-
       const validBody = { roomId: 1 };
 
       const response = await server
-        .put(`/booking/${otherUserBooking.id}`)
+        .put(`/booking/${faker.datatype.bigInt()}`)
         .set('Authorization', `Bearer ${token}`)
         .send({
           roomId: room.id,
@@ -354,7 +351,7 @@ describe('PUT /booking', () => {
       expect(response.status).toEqual(httpStatus.NOT_FOUND);
     });
 
-    it("should respond with status 403 with a invalid body - there's not vacancy", async () => {
+    it('should respond with status 403 when there is no vacancy in the room', async () => {
       const user = await createUser();
       const token = await generateValidToken(user);
       const enrollment = await createEnrollmentWithAddress(user);
@@ -369,9 +366,12 @@ describe('PUT /booking', () => {
 
       const booking = await createBooking({ userId: user.id, roomId: room.id });
 
-      await createBooking({ userId: user.id, roomId: room.id });
-
-      await createBooking({ userId: user.id, roomId: room.id });
+      const otherUser = await createUser();
+      await createBooking({ userId: otherUser.id, roomId: otherRoom.id });
+      const otherUser2 = await createUser();
+      await createBooking({ userId: otherUser2.id, roomId: otherRoom.id });
+      const otherUser3 = await createUser();
+      await createBooking({ userId: otherUser3.id, roomId: otherRoom.id });
 
       const response = await server.put(`/booking/${booking.id}`).set('Authorization', `Bearer ${token}`).send({
         roomId: otherRoom.id,

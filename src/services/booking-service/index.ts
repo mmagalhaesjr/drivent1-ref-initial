@@ -32,7 +32,7 @@ async function createBooking(userId: number, roomId: number): Promise<Booking> {
 }
 
 async function getBookingByUserId(userId: number) {
-  const userBooking = await bookingRepository.findBookingById(userId);
+  const userBooking = await bookingRepository.findBookingByUserId(userId);
 
   if (!userBooking) throw notFoundError();
 
@@ -44,9 +44,9 @@ async function getBookingByUserId(userId: number) {
   return result;
 }
 
-async function updateBooking(userId: number, roomId: number) {
-  const userBooking = await bookingRepository.findBookingById(userId);
-  if (!userBooking) throw notFoundError();
+async function updateBooking(userId: number, roomId: number, bookingId: number) {
+  const userBooking = await bookingRepository.findBookingById(bookingId);
+  if (!userBooking) throw cannotBooking();
 
   const room = await hotelRepository.findRoom(roomId);
   if (!room) throw notFoundError();
