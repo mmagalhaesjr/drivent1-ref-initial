@@ -66,3 +66,6 @@ const bookingService = {
 };
 
 export default bookingService;
+function cannotBookRoomError() {
+  throw new Error('Function not implemented.');
+}

@@ -9,6 +9,9 @@ export async function createPayment(ticketId: number, value: number) {
       cardIssuer: faker.name.findName(),
       cardLastDigits: faker.datatype.number({ min: 1000, max: 9999 }).toString(),
     },
+    include: {
+      Ticket: true,
+    },
   });
 }
 
